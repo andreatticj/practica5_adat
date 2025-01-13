@@ -35,7 +35,7 @@ public class GimnasioDB {
 				System.out.println("1. Cuota Socio");
 				System.out.println("2. Cuota Total");
 				System.out.println("3. Subir Ficheros");
-				System.out.println("0. Salir");
+				System.out.println("0. Instertar dato");
 
 				// Leer opción del usuario
 				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -48,7 +48,7 @@ public class GimnasioDB {
 				} else if ("3".equals(opcion)) {
 					subirFicheros(); // Subir los ficheros XML a la colección
 				} else if ("0".equals(opcion)) {
-					break; // Salir del programa
+					insertarActividad("100","3", "prueba insertar");
 				}
 			}
 
@@ -208,5 +208,30 @@ public class GimnasioDB {
 				"xmldb:store('/db/GIMNASIO', 'cuota_total.xml', '" + xmlFinal.toString().replace("'", "\\'") + "')");
 		System.out.println("Archivo 'cuota_total.xml' creado y almacenado.");
 	}
+
+	/**
+ * Inserta una actividad en el archivo actividades_gim.xml.
+ *
+ * @param cod El código de la actividad.
+ * @param tipo El tipo de la actividad.
+ * @param nombre El nombre de la actividad.
+ */
+private static void insertarActividad(String cod, String tipo, String nombre) throws XMLDBException {
+    String xquery = String.format("""
+        update insert 
+        <fila_actividades cod="%s" tipo="%s">
+            <NOMBRE>%s</NOMBRE>
+        </fila_actividades>
+        into doc('/db/GIMNASIO/actividades_gim.xml')/ACTIVIDADES_GIM
+    """, cod, tipo, nombre);
+
+    // Ejecutar la consulta de actualización
+    XQueryService service = (XQueryService) conexion.getService("XQueryService", "1.0");
+    service.setProperty("indent", "yes");
+    service.query(xquery);
+
+    System.out.println("Actividad insertada correctamente en actividades_gim.xml.");
+}
+
 }
 
